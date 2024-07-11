@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            width: 800px;
+            height: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .login-box, .register-box {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .login-box {
+            background-color: white;
+        }
+
+        .register-box {
+            background-color: #00bfa5;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 36px;
+            text-align: center;
+        }
+
+        .textbox {
+            margin-bottom: 20px;
+        }
+
+        .textbox label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .textbox input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .textbox span {
+            color: red;
+        }
+
+        .btn, .btn-register {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: red;
+            color: white;
+        }
+
+        .btn-register {
+            background-color: white;
+            color: #00bfa5;
+            border: 1px solid white;
+        }
+
+        .btn-register:hover {
+            background-color: #f0f0f0;
+        }
+
+        .register-container {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            width: 400px;
+            padding: 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .register-container.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="login-box">
+        <h2>用户登录</h2>
+        <form id="loginForm">
+            <div class="textbox">
+                <label for="name">用户名 <span>*</span></label>
+                <input type="text" id="name" placeholder="请输入用户名">
+            </div>
+            <div class="textbox">
+                <label for="password">密码 <span>*</span></label>
+                <input type="password" id="password" placeholder="请输入密码">
+            </div>
+            <button type="submit" class="btn" >登录</button>
+        </form>
+    </div>
+    <div class="register-box">
+        <h2>没有账号？</h2>
+        <p>立即注册加入我们吧，一起完成区块链应用开发</p>
+        <button class="btn-register" onclick="showRegisterForm()">注册</button>
+    </div>
+</div>
+<div class="register-container" id="registerContainer">
+    <h2>用户注册</h2>
+    <form id="registerForm">
+        <div class="textbox">
+            <label for="regName">姓名</label>
+            <input type="text" id="regName" placeholder="请输入姓名">
+        </div>
+        <div class="textbox">
+            <label for="regPassword">密码</label>
+            <input type="password" id="regPassword" placeholder="请输入密码">
+        </div>
+        <div class="textbox">
+            <label for="regEmail">邮箱</label>
+            <input type="email" id="regEmail" placeholder="请输入邮箱">
+        </div>
+        <div class="textbox">
+            <label for="regRole">角色</label>
+            <input type="text" id="regRole" placeholder="请输入角色">
+        </div>
+        <div class="textbox">
+            <label for="regAge">年龄</label>
+            <input type="number" id="regAge" placeholder="请输入年龄">
+        </div>
+        <div class="textbox">
+            <label for="regAddress">地址</label>
+            <input type="text" id="regAddress" placeholder="请输入地址">
+        </div>
+        <button type="submit" class="btn">注册</button>
+    </form>
+</div>
+<script>
+    function showRegisterForm() {
+        document.getElementById('registerContainer').classList.add('active');
+    }
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // 简单的表单验证逻辑
+        const name = document.getElementById('name').value;
+        const password = document.getElementById('password').value;
+
+        if (name === '' || password === '') {
+            alert('请输入用户名和密码');
+        } else {
+            // 调用后端 API 进行登录验证
+            fetch('http://"你的虚拟机IP":6060/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name, password: password })
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.code === 200) {
+                        alert('登录成功');
+                        console.log(res);
+                        localStorage.setItem('token', res.data);
+                        // 检查是否成功保存 token
+                        const savedToken = localStorage.getItem("token");
+                        if (savedToken) {
+                            console.log("成功获取到token:", savedToken);
+                        } else {
+                            console.log("未能成功获取到token");
+                        }
+                        // 登录成功，进入页面
+                        window.location.href = 'asset.html';
+                    } else {
+                        alert('登录失败：' + res.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('登录失败，请稍后重试');
+                });
+        }
+    });
+
+
+
+
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // 注册表单处理逻辑
+        const name = document.getElementById('regName').value;
+        const password = document.getElementById('regPassword').value;
+        const email = document.getElementById('regEmail').value;
+        const role = document.getElementById('regRole').value;
+        const age = document.getElementById('regAge').value;
+        const address = document.getElementById('regAddress').value;
+
+        if (name === '' || password === '' || email === '' || role === '' || age === '' || address === '') {
+            alert('请填写所有字段');
+        } else {
+            // 构造注册信息对象
+            const registerData = {
+                name: name,
+                password: password,
+                email: email,
+                role: role,
+                age: age,
+                address: address
+            };
+
+            // 发送注册请求到后端接口
+            fetch('http://"你的虚拟机IP":6060/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registerData)
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.code === 200) {
+                        alert('注册成功');
+                        // 可以在这里处理注册成功后的逻辑，例如跳转到登录页面等
+                    } else {
+                        alert('注册失败：' + res.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('注册失败，请稍后重试');
+                });
+        }
+    });
+</script>
+</body>
+</html>

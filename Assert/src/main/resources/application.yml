@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/asset?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456//数据库密码
+  application:
+    name: Asset
+
+# 配置mybatis实体和xml映射
+mybatis-plus:
+  mapper-locations: classpath:mapper1/*.xml
+  type-aliases-package: com.my.laundry.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+
+server:
+  port: 6060

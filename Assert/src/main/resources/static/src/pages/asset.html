@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>界面示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 350px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #000;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+
+        .section h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #000;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 5px;
+            background-color: #fff;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 用户转账 -->
+    <div class="section">
+        <h2>用户转账</h2>
+        <form id="transferForm">
+            <label for="userAddressTransfer">用户地址:</label>
+            <input type="text" id="userAddressTransfer" placeholder="请输入地址">
+            <label for="amountTransfer">转账金额:</label>
+            <input type="text" id="amountTransfer" placeholder="请输入金额">
+            <button type="submit">转账</button>
+        </form>
+    </div>
+
+    <!-- 机构发行 -->
+    <div class="section">
+        <h2>机构发行</h2>
+        <form id="issueForm">
+            <label for="userAddressIssue">用户地址:</label>
+            <input type="text" id="userAddressIssue" placeholder="请输入地址">
+            <label for="amountIssue">发行金额:</label>
+            <input type="text" id="amountIssue" placeholder="请输入金额">
+            <button type="submit">发行</button>
+        </form>
+    </div>
+
+    <!-- 余额查询 -->
+    <div class="section">
+        <h2>余额查询</h2>
+        <form id="queryForm">
+            <label for="userAddressQuery">用户地址:</label>
+            <input type="text" id="userAddressQuery" placeholder="请输入地址">
+            <button type="submit">查询</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 获取存储的 token
+    function getToken() {
+        return localStorage.getItem('token');
+    }
+
+    // 用户转账
+    document.getElementById('transferForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const userAddress = document.getElementById('userAddressTransfer').value;
+        const amount = document.getElementById('amountTransfer').value;
+        const token = getToken();
+
+        if (userAddress === '' || amount === '') {
+            alert('请输入用户地址和转账金额');
+        } else {
+            fetch('http://"你的虚拟机IP":6060/asset/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ userAddress: userAddress, amount: amount })
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.code === 200) {
+                        alert('资产转账成功');
+                    } else {
+                        alert('资产转账失败：' + res.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('资产转账失败，请稍后重试');
+                });
+        }
+    });
+
+    // 机构发行
+    document.getElementById('issueForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const userAddress = document.getElementById('userAddressIssue').value;
+        const amount = document.getElementById('amountIssue').value;
+        const token = getToken();
+
+        if (userAddress === '' || amount === '') {
+            alert('请输入用户地址和发行金额');
+        } else {
+            fetch('http://"你的虚拟机IP":6060/asset/issue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ userAddress: userAddress, amount: amount })
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.code === 200) {
+                        alert('资产发行成功');
+                    } else {
+                        alert('资产发行失败：' + res.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('资产发行失败，请稍后重试');
+                });
+        }
+    });
+
+    document.getElementById('queryForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const userAddress = document.getElementById('userAddressQuery').value;
+        const token = getToken();
+        if (userAddress === '') {
+            alert('请输入用户地址');
+        } else {
+            fetch('http://"你的虚拟机IP":6060/asset/getBalance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ userAddress: userAddress })
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.code === 200) {
+                        alert(`用户余额为：${res.data}`);
+                    } else {
+                        alert('余额查询失败：' + res.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('余额查询失败，请稍后重试');
+                });
+        }
+    });
+</script>
+</body>
+</html>
